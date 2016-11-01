@@ -20,6 +20,22 @@ def test_sparse_dot_10_100_1():
 def test_sparse_dot_100_100_0p1():
     assert is_naive_same(generate_test_set(100, 100, 0.1))
 
+def test_cos_distance_using_scipy_1():
+    '''Test the cos distance calculation against scipy
+       (must be installed for this test)'''
+    import scipy.spatial.distance
+    a, b = generate_test_set(2, 1000, 1)
+    assert np.isclose(scipy.spatial.distance.cosine(a, b),
+                      sparse_dot.cos_distance_using_sparse([a, b])['sparse_result'][0])
+
+def test_cos_distance_using_scipy_2():
+    '''Test the cos distance calculation against scipy
+       (must be installed for this test)'''
+    import scipy.spatial.distance
+    rows = generate_test_set(100, 1000, 1)
+    for i, j, sr in sparse_dot.cos_distance_using_sparse(rows):
+        assert np.isclose(sr, scipy.spatial.distance.cosine(rows[i], rows[j]))
+
 def run_timing_test_v1_1000_1000_0p1():
     return run_timing_test_v1(1000, 1000, 0.1)
 
@@ -48,6 +64,9 @@ if __name__ == '__main__':
     is_naive_same(generate_test_set(100, 100, 0.1), print_time=True)
     is_naive_same(generate_test_set(1000, 1000, 0.1), print_time=True)
     
+    test_cos_distance_using_scipy_1()
+    test_cos_distance_using_scipy_2()
+
     print run_timing_test_v1_1000_1000_0p1()
     print run_timing_test_1000_1000_100000()
     #print run_timing_test_v1_10000_10000_0p1() # ~100s

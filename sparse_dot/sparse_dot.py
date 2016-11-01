@@ -25,9 +25,11 @@ def dot_full_using_sparse(arr):
     return sparse_dot_full(to_saf_list(arr))
 
 def sparse_cos_distance(saf_list):
-    #norms = normalize saf_list
+    norms = np.array([np.linalg.norm(saf['array']) for saf in saf_list])
     dots = sparse_dot_full(saf_list)
-    #return dots / norms or something     # do the cos distance
+    norm_i, norm_j = norms[(dots['i'],)], norms[(dots['j'],)]
+    dots['sparse_result'] = 1 - dots['sparse_result'] / (norm_i * norm_j)
+    return dots
 
 def cos_distance_using_sparse(arr):
     return sparse_cos_distance(to_saf_list(arr))
