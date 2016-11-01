@@ -17,7 +17,6 @@ def to_saf_list(arr2d):
 
 def sparse_dot_full(saf_list):
     '''Takes a list of arrays in locs/array dict form and '''
-    print 'saf_list:', saf_list
     return cy_sparse_dot.cy_sparse_dot_full(saf_list)
 
 def dot_full_using_sparse(arr):

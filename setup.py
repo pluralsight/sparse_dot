@@ -38,6 +38,7 @@ setup(
     long_description=open('README.md').read(),
     install_requires=['numpy>=1.0',
                       'cython>=0.2', # this might need to be newer?
+                      'np_utils>=0.4.6', # this is only used for testing currently
                      ],
     extras_require = {
                      },

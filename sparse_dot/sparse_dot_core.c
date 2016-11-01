@@ -17,38 +17,21 @@ float sparse_dot(SparseArrayF * saf_ptr_a,
     int len_a = saf_ptr_a->len;
     int len_b = saf_ptr_b->len;
     
-    printf("len_a %i\n", len_a);
-    printf("len_b %i\n", len_b);
-    
     for(i=0; i < len_a + len_b; i++) {
         if((i_a >= len_a) || (i_b >= len_b)) {
-            printf("Break: ");
-            printf("i_a i_b %i %i\n", i_a, i_b);
-            printf("len_a len_b %i %i\n", len_a, len_b);
             break;
         }
         l_a = locs_a[i_a];
         l_b = locs_b[i_b];
         
-        printf("i_a %i\n", i_a);
-        printf("i_b %i\n", i_b);
-        printf("l_a %i\n", l_a);
-        printf("l_b %i\n", l_b);
-        
         if(l_b < l_a) {
             i_b++;
-            printf("i_b++\n");
         } else if(l_a < l_b) {
             i_a++;
-            printf("i_a++\n");
         } else { // l_a == l_b
-            printf("Hit!\n");
-            printf("dat_a %f\n", dat_a[i_a]);
-            printf("dat_b %f\n", dat_b[i_b]);
             sum += dat_a[i_a] * dat_b[i_b];
             i_a++;
             i_b++;
-            printf("i_a++;i_b++\n");
         }
     }
     return(sum);
