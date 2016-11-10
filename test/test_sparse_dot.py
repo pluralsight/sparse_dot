@@ -2,8 +2,34 @@
 
 import numpy as np
 import sparse_dot
-from sparse_dot.testing_utils import (generate_test_set, dot_equal_basic,
-                                      is_naive_same, run_timing_test_v1, run_timing_test)
+from sparse_dot.testing_utils import (generate_test_set,
+    sparse_dot_full_validate_pass, dot_equal_basic, is_naive_same,
+    run_timing_test_v1, run_timing_test)
+
+SAF_GOOD = {'locs': np.array([0, 1, 4], dtype=np.uint32),
+            'array': np.array([4.2, 9.0, 5.1], dtype=np.float32)}
+SAF_BAD_1 = {'locs': np.array([4, 0, 1], dtype=np.uint32),
+             'array': np.array([4.2, 9.0, 5.1], dtype=np.float32)}
+SAF_BAD_2 = {'locs': np.array([0, 1, 4], dtype=np.uint32),
+             'array': [4.2, 9.0, 5.1]}
+
+def test_validate_saf_1():
+    assert sparse_dot.validate_saf(sparse_dot.to_saf([0,2,0,1,3,4,2,0,0,1,0]))
+    
+def test_validate_saf_2():
+    assert sparse_dot.validate_saf(SAF_GOOD)
+    assert not sparse_dot.validate_saf(SAF_BAD_1, verbose=False)
+    assert not sparse_dot.validate_saf(SAF_BAD_2, verbose=False)
+
+def test_sparse_dot_full_validation_1():
+    assert sparse_dot_full_validate_pass(sparse_dot.to_saf_list(np.arange(6).reshape(2,3)))
+
+def test_sparse_dot_full_validation_2():
+    assert sparse_dot_full_validate_pass([SAF_GOOD])
+    assert not sparse_dot_full_validate_pass([SAF_BAD_1])
+    assert not sparse_dot_full_validate_pass([SAF_GOOD, SAF_BAD_1])
+    assert not sparse_dot_full_validate_pass([SAF_BAD_2, SAF_BAD_1])
+
 
 def test_sparse_dot_simple():
     assert dot_equal_basic(*np.arange(6).reshape(2,3))
@@ -55,6 +81,10 @@ def run_timing_test_5000_20000_10000():
     return run_timing_test(5000, 200000, 10000)
 
 if __name__ == '__main__':
+    test_validate_saf_1()
+    test_validate_saf_2()
+    test_sparse_dot_full_validation_1()
+    test_sparse_dot_full_validation_2
     test_sparse_dot_simple()
     test_sparse_dot_basic_100()
     test_sparse_dot_basic_100_1()
@@ -69,10 +99,12 @@ if __name__ == '__main__':
 
     print run_timing_test_v1_1000_1000_0p1()
     print run_timing_test_1000_1000_100000()
+    
+    # These are all run in the benchmarks instead:
     #print run_timing_test_v1_10000_10000_0p1() # ~100s
-    #print run_timing_test_10000_10000_10000000() # ~37s
-    #print run_timing_test_1000_20000_10000000() # 3s
-    #print run_timing_test_5000_20000_10000() # LOL, only 0.05s to run but 60s to generate the initial data :-P
+    #print run_timing_test_10000_10000_10000000() # ~100s
+    #print run_timing_test_1000_20000_10000000() # 10s
+    #print run_timing_test_5000_20000_10000() # LOL, only 0.1s to run but 8s to generate the initial data :-P
     
     # FAILS:
     #print run_timing_test_v1_10000_1000000_0p01() # Memory Error

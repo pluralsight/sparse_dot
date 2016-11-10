@@ -21,6 +21,14 @@ def generate_test_set(num_rows=100,
     arr = arr.reshape((num_rows, num_cols))
     return arr
 
+def _generate_saf_from_ind_group(ind_group, big_locs, big_vals, num_cols):
+    '''Helper function for generate_test_saf_list'''
+    locs = big_locs[ind_group] % num_cols
+    arg_sort = np.argsort(locs)
+    return {'locs': locs[arg_sort],
+            'array': big_vals[ind_group][arg_sort]}
+                
+
 def generate_test_saf_list(num_rows=100,
                            num_cols=100,
                            num_entries=1000,
@@ -33,13 +41,23 @@ def generate_test_saf_list(num_rows=100,
         'array': array([...])}
        '''
     np.random.seed(seed)
-    big_locs = np.sort(np.random.choice(num_rows * num_cols, num_entries, replace=False))
-    big_vals = np.random.random(num_entries)
+    big_locs = np.sort(np.random.choice(num_rows * num_cols, num_entries, replace=False).astype(np.uint32))
+    big_vals = np.random.random(num_entries).astype(np.float32)
     keys, ind_groups = np_utils.get_index_groups(big_locs // num_cols)
-    saf_list = [{'locs': big_locs[g] % num_cols,
-                 'array': big_vals[g]}
-                for k, g in izip(keys, ind_groups)]
+    saf_list = [_generate_saf_from_ind_group(g, big_locs, big_vals, num_cols)
+                for g in ind_groups]
     return saf_list
+
+def sparse_dot_full_validate_pass(saf_list):
+    '''Returns a boolean denoting whether or not validation passed when
+       trying this argument in sparse_dot_full'''
+    success = None
+    try:
+        sparse_dot.sparse_dot_full(saf_list, verbose=False)
+        success = True
+    except:
+        success = False
+    return success
 
 def naive_dot(arr2d):
     '''arr2d is an 2d array (or list of arrays)
