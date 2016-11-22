@@ -49,12 +49,21 @@ def dot_full_using_sparse(arr):
        combination of rows'''
     return sparse_dot_full(to_saf_list(arr), validate=False)
 
-def sparse_cos_distance(saf_list, validate=True, verbose=True):
+def sparse_cos_similarity(saf_list, validate=True, verbose=True):
     norms = np.array([np.linalg.norm(saf['array']) for saf in saf_list])
     dots = sparse_dot_full(saf_list, validate=validate, verbose=verbose)
     norm_i, norm_j = norms[(dots['i'],)], norms[(dots['j'],)]
-    dots['sparse_result'] = 1 - dots['sparse_result'] / (norm_i * norm_j)
+    dots['sparse_result'] /= norm_i * norm_j
     return dots
+
+def sparse_cos_distance(saf_list, validate=True, verbose=True):
+    dots = sparse_cos_similarity(saf_list, validate=validate, verbose=verbose)
+    dots['sparse_result'] *= -1
+    dots['sparse_result'] += 1
+    return dots
+
+def cos_similarity_using_sparse(arr):
+    return sparse_cos_similarity(to_saf_list(arr))
 
 def cos_distance_using_sparse(arr):
     return sparse_cos_distance(to_saf_list(arr))
