@@ -1,3 +1,6 @@
 include *.txt
 include *.rst
 include *.md
+include sparse_dot/*.pyx
+include sparse_dot/*.h
+include sparse_dot/*.c
