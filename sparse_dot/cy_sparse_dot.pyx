@@ -1,8 +1,7 @@
-cimport c_python
-cimport c_numpy
 import numpy as np
-import multiprocessing
+cimport numpy as np
 
+import multiprocessing
 from cython.parallel cimport parallel
 from cython.parallel import prange
 cimport openmp
@@ -11,6 +10,7 @@ ctypedef unsigned int UINT32
 ctypedef unsigned long int UINT64
 
 cdef extern from "stdlib.h":
+    ctypedef int size_t
     void free(void* ptr)
     void* malloc(size_t size)
     void* realloc(void* ptr, size_t size)
@@ -45,8 +45,8 @@ cdef void set_SAF_from_py_dict(SparseArrayF * saf, input_dict, saf_ind=0):
        {'locs': <numpy array of uint32>,
         'array': <numpy array of float32>}
        '''
-    cdef c_numpy.ndarray locs_cn = input_dict['locs']
-    cdef c_numpy.ndarray array_cn = input_dict['array']
+    cdef np.ndarray locs_cn = input_dict['locs']
+    cdef np.ndarray array_cn = input_dict['array']
     
     saf[saf_ind].locs = <const UINT32 *> locs_cn.data
     saf[saf_ind].array = <const float *> array_cn.data
@@ -88,7 +88,7 @@ def cy_sparse_dot_full(py_saf_list):
     # Each thread then gets it's own num_items length buffer to store its result
     sparse_results_tmp_arr = np.zeros((num_threads, num_items),        # Make sure each thread uses separate memory
                                       dtype=SPARSE_RESULTS_DTYPE)
-    cdef c_numpy.ndarray sparse_results_cn
+    cdef np.ndarray sparse_results_cn
     cdef SparseResult ** sparse_results_pointer_arr
     sparse_results_pointer_arr = <SparseResult **> malloc(num_threads * sizeof(SparseResult *))
     for i in range(num_threads):
